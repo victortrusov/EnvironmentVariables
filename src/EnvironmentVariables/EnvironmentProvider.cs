@@ -16,8 +16,6 @@ namespace EnvironmentVariables
 
         public EnvironmentProvider()
         {
-            type = typeof(T);
-
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach (var prop in properties)
             {
