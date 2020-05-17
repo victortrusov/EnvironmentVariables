@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using EnvironmentVariables;
 
 namespace Example
@@ -8,9 +9,14 @@ namespace Example
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
-            var envProvider = new EnvironmentProvider<Config>();
-            Console.WriteLine(envProvider.Values.AspNetCoreEnvironment ?? "null");
-            Console.WriteLine(envProvider.Values.MyEnvVariable ?? "null");
+
+            var config = new EnvironmentProvider<Config>().Values;
+
+            Console.WriteLine(config.AspNetCoreEnvironment);
+            Console.WriteLine(config.MyEnvVariableString);
+            Console.WriteLine(config.MyEnvVariableInt);
+            Console.WriteLine(config.MyEnvVariableBool);
+            Console.WriteLine(config.MyEnvVariableDouble);
         }
     }
 }
