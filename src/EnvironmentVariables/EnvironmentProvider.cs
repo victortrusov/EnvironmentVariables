@@ -3,40 +3,54 @@ using System.Collections.Generic;
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using System.Linq.Expressions;
 
 namespace EnvironmentVariables
 {
-    public class EnvironmentProvider<T> where T : class, new()
+    public partial class EnvironmentProvider<T> where T : class, new()
     {
-        public T Values { get; private set; } = new T();
-        private readonly Dictionary<string, PropertyInfo> properties =
-            typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .ToDictionary(
-                    x => x.GetCustomAttribute<EnvAttribute>()?.Name,
-                    x => x
-                );
+        private readonly Type type = typeof(T);
+        private readonly List<MemberMap> members = new List<MemberMap>();
 
-        public EnvironmentProvider() => Load();
+        public T Values { get; private set; } = new T();
+
+        public EnvironmentProvider()
+        {
+            type = typeof(T);
+
+            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            foreach (var prop in properties)
+            {
+                var env = prop.GetCustomAttribute<EnvAttribute>()?.Name;
+                if (string.IsNullOrEmpty(env))
+                    continue;
+
+                members.Add(new MemberMap
+                {
+                    EnvName = env,
+                    Type = prop.PropertyType,
+                    Setter = Utils.GetPropertySetter(prop)
+                });
+            }
+
+            Load();
+        }
 
         public void Load()
         {
-            foreach (var property in properties)
+            foreach (var member in members)
             {
-                // skip if no EnvAttribute or if not writable
-                if (string.IsNullOrEmpty(property.Key) || !property.Value.CanWrite) continue;
-
                 //skip if no value
-                var stringValue = Environment.GetEnvironmentVariable(property.Key);
+                var stringValue = Environment.GetEnvironmentVariable(member.EnvName);
                 if (string.IsNullOrEmpty(stringValue)) continue;
 
-                object propValue = property.Value.PropertyType != typeof(string)
-                    ? TypeDescriptor.GetConverter(property.Value.PropertyType).ConvertFromString(stringValue)
+                object propValue = member.Type != typeof(string)
+                    ? TypeDescriptor.GetConverter(member.Type).ConvertFromString(stringValue)
                     : stringValue;
 
-                property.Value.SetValue(Values, propValue);
+                member.Setter(Values, propValue);
             }
         }
-
 
     }
 }

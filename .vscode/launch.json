@@ -17,10 +17,10 @@
             "internalConsoleOptions": "openOnSessionStart",
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "MY_ENV_VARIABLE_STRING": "HereIsValue",
-                "MY_ENV_VARIABLE_INT": "123",
-                "MY_ENV_VARIABLE_BOOL": "true",
-                "MY_ENV_VARIABLE_DOUBLE": "1.213323"
+                "MY_ENV_STRING": "HereIsValue",
+                "MY_ENV_INT": "123",
+                "MY_ENV_BOOL": "true",
+                "MY_ENV_DOUBLE": "1.213323"
             }
         },
         {

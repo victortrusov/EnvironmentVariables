@@ -7,16 +7,16 @@ namespace Example
         [Env("ASPNETCORE_ENVIRONMENT")]
         public string AspNetCoreEnvironment { get; set; }
 
-        [Env("MY_ENV_VARIABLE_STRING")]
-        public string MyEnvVariableString { get; set; }
+        [Env("MY_ENV_STRING")]
+        public string MyEnvString { get; set; }
 
-        [Env("MY_ENV_VARIABLE_INT")]
-        public int MyEnvVariableInt { get; set; }
+        [Env("MY_ENV_INT")]
+        public int MyEnvInt { get; set; }
 
-        [Env("MY_ENV_VARIABLE_BOOL")]
-        public bool MyEnvVariableBool { get; set; }
+        [Env("MY_ENV_BOOL")]
+        public bool MyEnvBool { get; set; }
 
-        [Env("MY_ENV_VARIABLE_DOUBLE")]
-        public double MyEnvVariableDouble { get; set; }
+        [Env("MY_ENV_DOUBLE")]
+        public double MyEnvDouble { get; set; }
     }
 }
