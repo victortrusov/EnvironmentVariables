@@ -16,51 +16,37 @@ namespace EnvironmentVariables
                     str,
 
                 { IsArray: true } =>
-                    ConvertAndCastToArray(str, type),
+                    ConvertAndCast(str, type),
 
                 { IsGenericType: true } when typeof(IEnumerable).IsAssignableFrom(type) =>
-                    ConvertAndCastToList(str, type),
+                    ConvertAndCast(str, type, true),
 
                 _ => ConvertBase(str, type)
             };
 
-        public static object ConvertAndCastToArray(string str, Type type)
+        private static object ConvertAndCast(string str, Type type, bool isList = false)
         {
-            var elementType = type.GetElementType();
-            var list = ConvertToEnumerable(str, type, elementType);
-            var toArrayMethod = typeof(Enumerable)
-                .GetMethod("ToArray").MakeGenericMethod(
-                new[] {
-                    elementType
-                });
-            return toArrayMethod.Invoke(null, new object[] { list });
-        }
+            // get element type
+            var elementType = isList
+                ? type.GetGenericArguments().Single()
+                : type.GetElementType();
 
-        public static object ConvertAndCastToList(string str, Type type)
-        {
-            var elementType = type.GetGenericArguments().Single();
-            var list = ConvertToEnumerable(str, type, elementType);
-            var toListMethod = typeof(Enumerable)
-                .GetMethod("ToList").MakeGenericMethod(
-                new[] {
-                    elementType
-                });
-            return toListMethod.Invoke(null, new object[] { list });
-        }
-
-        public static object ConvertToEnumerable(string str, Type type, Type elementType)
-        {
+            //converting every element if not string
             var list = elementType == typeof(string)
                 ? SplitArray(str)
                 : SplitArray(str).Select(x => ConvertBase(x, elementType));
 
-            var castMethod = typeof(Enumerable)
-                .GetMethod("Cast")
-                .MakeGenericMethod(new[] { elementType });
+            //cast to change element type
+            var castedList = InvokeEnumerableMethod("Cast", elementType, list);
 
-            return castMethod.Invoke(null, new object[] { list });
+            //convert IEnumerable to somethting else
+            return InvokeEnumerableMethod(isList ? "ToList" : "ToArray", elementType, castedList);
         }
 
+        private static object InvokeEnumerableMethod(string methodName, Type elementType, object list) =>
+            typeof(Enumerable).GetMethod(methodName)
+                .MakeGenericMethod(new[] { elementType })
+                .Invoke(null, new object[] { list });
 
         public static string[] SplitArray(string str) => str.Split(new[] { ',', ';' });
 
