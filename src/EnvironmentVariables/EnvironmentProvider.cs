@@ -38,14 +38,13 @@ namespace EnvironmentVariables
         {
             foreach (var member in members)
             {
-                //skip if no value
+                //get env value
                 var stringValue = Environment.GetEnvironmentVariable(member.EnvName);
+
+                //skip if no value
                 if (string.IsNullOrEmpty(stringValue)) continue;
 
-                object propValue = member.Type != typeof(string)
-                    ? TypeDescriptor.GetConverter(member.Type).ConvertFromString(stringValue)
-                    : stringValue;
-
+                object propValue = Utils.Convert(stringValue, member.Type);
                 member.Setter(Values, propValue);
             }
         }

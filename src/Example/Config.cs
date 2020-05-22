@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using EnvironmentVariables;
 
 namespace Example
@@ -18,5 +19,23 @@ namespace Example
 
         [Env("MY_ENV_DOUBLE")]
         public double MyEnvDouble { get; set; }
+
+        [Env("MY_ENV_STRING_ARRAY")]
+        public string[] MyEnvStringArray { get; set; }
+
+        [Env("MY_ENV_STRING_ARRAY")]
+        public List<string> MyEnvStringList { get; set; }
+
+        [Env("MY_ENV_STRING_ARRAY")]
+        public IEnumerable<string> MyEnvStringEnumerable { get; set; }
+
+        [Env("MY_ENV_INT_ARRAY")]
+        public int[] MyEnvIntArray { get; set; }
+
+        [Env("MY_ENV_INT_ARRAY")]
+        public List<int> MyEnvIntList { get; set; }
+
+        [Env("MY_ENV_INT_ARRAY")]
+        public IEnumerable<int> MyEnvIntEnumerable { get; set; }
     }
 }
