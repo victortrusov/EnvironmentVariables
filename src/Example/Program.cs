@@ -13,17 +13,19 @@ namespace Example
 
             var provider = new EnvironmentProvider<Config>();
 
-            Console.WriteLine(provider.Values.AspNetCoreEnvironment);
-            Console.WriteLine(provider.Values.MyEnvString);
-            Console.WriteLine(provider.Values.MyEnvInt);
-            Console.WriteLine(provider.Values.MyEnvBool);
-            Console.WriteLine(provider.Values.MyEnvDouble);
-            Console.WriteLine(string.Join(", ", provider.Values.MyEnvStringArray));
-            Console.WriteLine(string.Join(", ", provider.Values.MyEnvStringList));
-            Console.WriteLine(string.Join(", ", provider.Values.MyEnvStringEnumerable));
-            Console.WriteLine(string.Join(", ", provider.Values.MyEnvIntArray));
-            Console.WriteLine(string.Join(", ", provider.Values.MyEnvIntList));
-            Console.WriteLine(string.Join(", ", provider.Values.MyEnvIntEnumerable));
+            var values = provider.Values;
+
+            Console.WriteLine(values.AspNetCoreEnvironment);
+            Console.WriteLine(values.MyEnvString);
+            Console.WriteLine(values.MyEnvInt);
+            Console.WriteLine(values.MyEnvBool);
+            Console.WriteLine(values.MyEnvDouble);
+            Console.WriteLine(string.Join(", ", values.MyEnvStringArray));
+            Console.WriteLine(string.Join(", ", values.MyEnvStringList));
+            Console.WriteLine(string.Join(", ", values.MyEnvStringEnumerable));
+            Console.WriteLine(string.Join(", ", values.MyEnvIntArray));
+            Console.WriteLine(string.Join(", ", values.MyEnvIntList));
+            Console.WriteLine(string.Join(", ", values.MyEnvIntEnumerable));
         }
     }
 }
