@@ -26,6 +26,8 @@ namespace Example
             Console.WriteLine(string.Join(", ", values.MyEnvIntArray));
             Console.WriteLine(string.Join(", ", values.MyEnvIntList));
             Console.WriteLine(string.Join(", ", values.MyEnvIntEnumerable));
+            Console.WriteLine(string.Join(", ", values.MyEnvIntDictionary));
+            Console.WriteLine(string.Join(", ", values.MyEnvIntStrDictionary));
         }
     }
 }

@@ -22,7 +22,8 @@
                 "MY_ENV_BOOL": "true",
                 "MY_ENV_DOUBLE": "1.213323",
                 "MY_ENV_STRING_ARRAY": "asf,asfasf,asfa",
-                "MY_ENV_INT_ARRAY": "1,2,4,8"
+                "MY_ENV_INT_ARRAY": "1,2,4,8",
+                "MY_ENV_INT_DICT": "1=10,2=20,4=40,8=80"
             }
         },
         {

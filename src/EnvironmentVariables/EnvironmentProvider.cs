@@ -48,6 +48,10 @@ namespace EnvironmentVariables
 
             Reload();
         }
+
+        /// <summary>
+        /// Reload all values
+        /// </summary>
         public void Reload()
         {
             foreach (var member in members)

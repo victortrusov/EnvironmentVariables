@@ -16,20 +16,23 @@ namespace EnvironmentVariables
                     str,
 
                 { IsArray: true } =>
-                    ConvertAndCast(str, type),
+                    ConvertCollection(str, type),
+
+                { IsGenericType: true } when typeof(IDictionary).IsAssignableFrom(type) =>
+                    ConvertDictionary(str, type),
 
                 { IsGenericType: true } when typeof(IEnumerable).IsAssignableFrom(type) =>
-                    ConvertAndCast(str, type, true),
+                    ConvertCollection(str, type),
 
                 _ => ConvertBase(str, type)
             };
 
-        private static object ConvertAndCast(string str, Type type, bool isList = false)
+        private static object ConvertCollection(string str, Type type)
         {
             // get element type
-            var elementType = isList
-                ? type.GetGenericArguments().Single()
-                : type.GetElementType();
+            var elementType = type.IsArray
+                ? type.GetElementType()
+                : type.GetGenericArguments().Single();
 
             //converting every element if not string
             var list = elementType == typeof(string)
@@ -40,7 +43,36 @@ namespace EnvironmentVariables
             var castedList = InvokeEnumerableMethod("Cast", elementType, list);
 
             //convert IEnumerable to somethting else
-            return InvokeEnumerableMethod(isList ? "ToList" : "ToArray", elementType, castedList);
+            return InvokeEnumerableMethod(type.IsArray ? "ToArray" : "ToList", elementType, castedList);
+        }
+
+        private static object ConvertDictionary(string str, Type type)
+        {
+            // get element types
+            var elementTypes = type.GetGenericArguments();
+            var (keyType, valueType) = (elementTypes[0], elementTypes[1]);
+
+            var list = SplitArray(str);
+
+            var dictionary = Activator.CreateInstance(type);
+            foreach (var keyValueString in list)
+            {
+                var keyValueArray = keyValueString.Split('=');
+                var (keyString, valueString) = (keyValueArray.ElementAtOrDefault(0), keyValueArray.ElementAtOrDefault(1));
+
+                object key = keyType == typeof(string)
+                    ? keyString
+                    : ConvertBase(keyString, keyType);
+
+                object value = valueType == typeof(string)
+                    ? valueString
+                    : ConvertBase(valueString, valueType);
+
+                type.GetMethod("Add", elementTypes)
+                    .Invoke(dictionary, new object[] { key, value });
+            }
+
+            return dictionary;
         }
 
         private static object InvokeEnumerableMethod(string methodName, Type elementType, object list) =>
@@ -48,9 +80,13 @@ namespace EnvironmentVariables
                 .MakeGenericMethod(new[] { elementType })
                 .Invoke(null, new object[] { list });
 
-        public static string[] SplitArray(string str) => str.Split(new[] { ',', ';' });
+        private static string[] SplitArray(string str) =>
+            str.Split(
+                str.Contains(';') ? ';' : ',',
+                StringSplitOptions.RemoveEmptyEntries
+            );
 
-        public static object ConvertBase(string str, Type type) => TypeDescriptor.GetConverter(type).ConvertFromString(str);
+        private static object ConvertBase(string str, Type type) => TypeDescriptor.GetConverter(type).ConvertFromString(str);
 
 
         public static Action<object, object> GetPropertySetter(PropertyInfo propertyInfo)

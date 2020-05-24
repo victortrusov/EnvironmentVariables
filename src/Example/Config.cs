@@ -37,5 +37,11 @@ namespace Example
 
         [Env("MY_ENV_INT_ARRAY")]
         public IEnumerable<int> MyEnvIntEnumerable { get; set; }
+
+        [Env("MY_ENV_INT_DICT")]
+        public Dictionary<int, int> MyEnvIntDictionary { get; set; }
+
+        [Env("MY_ENV_INT_DICT")]
+        public Dictionary<int, string> MyEnvIntStrDictionary { get; set; }
     }
 }
