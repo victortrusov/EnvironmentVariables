@@ -4,7 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Tests")]
 namespace EnvironmentVariables
 {
     internal static class Utils
@@ -46,89 +48,64 @@ namespace EnvironmentVariables
             return InvokeEnumerableMethod(type.IsArray ? "ToArray" : "ToList", elementType, castedList);
         }
 
-        private static object ConvertDictionary(string str, Type type)
-        {
-            // get element types
-            var elementTypes = type.GetGenericArguments();
-            var (keyType, valueType) = (elementTypes[0], elementTypes[1]);
-
-            var list = SplitArray(str);
-
-            var dictionary = Activator.CreateInstance(type);
-            foreach (var keyValueString in list)
-            {
-                var keyValueArray = keyValueString.Split('=');
-                var (keyString, valueString) = (keyValueArray.ElementAtOrDefault(0), keyValueArray.ElementAtOrDefault(1));
-
-                object key = keyType == typeof(string)
-                    ? keyString
-                    : ConvertBase(keyString, keyType);
-
-                object value = valueType == typeof(string)
-                    ? valueString
-                    : ConvertBase(valueString, valueType);
-
-                type.GetMethod("Add", elementTypes)
-                    .Invoke(dictionary, new object[] { key, value });
-            }
-
-            return dictionary;
-        }
-
         private static object InvokeEnumerableMethod(string methodName, Type elementType, object list) =>
             typeof(Enumerable).GetMethod(methodName)
                 .MakeGenericMethod(new[] { elementType })
                 .Invoke(null, new object[] { list });
 
-        private static string[] SplitArray(string str) =>
-            str.Split(
+        private static object ConvertDictionary(string str, Type type)
+        {
+            // get element types
+            var elementTypes = type.GetGenericArguments();
+
+            //split pairs
+            var keyValueStrings = SplitArray(str);
+
+            //create new dictionary
+            var dictionary = Activator.CreateInstance(type);
+
+            foreach (var keyValueString in keyValueStrings)
+            {
+                var keyValueStringArray = keyValueString.Split('=');
+
+                // convert both key and value
+                var keyValueArray = elementTypes.Select(
+                    (type, i) =>
+                    {
+                        var str = keyValueStringArray.ElementAtOrDefault(i);
+                        return type == typeof(string)
+                            ? str
+                            : ConvertBase(str, type);
+                    }
+                ).ToArray();
+
+                //add to dictionary
+                type.GetMethod("Add", elementTypes)
+                    .Invoke(dictionary, keyValueArray);
+            }
+
+            return dictionary;
+        }
+
+        private static IEnumerable<string> SplitArray(string str) =>
+            str.Trim().Split(
                 str.Contains(';') ? ';' : ',',
                 StringSplitOptions.RemoveEmptyEntries
-            );
+            )
+            .Select(x => x.Trim());
 
-        private static object ConvertBase(string str, Type type) => TypeDescriptor.GetConverter(type).ConvertFromString(str);
+        private static object ConvertBase(string str, Type type) =>
+            string.IsNullOrWhiteSpace(str)
+                ? Activator.CreateInstance(type)
+                : TypeDescriptor.GetConverter(type).ConvertFromString(str);
 
 
         public static Action<object, object> GetPropertySetter(PropertyInfo propertyInfo)
         {
             if (!propertyInfo.CanWrite)
-            {
-                var message = string.Format(
-                    "The property '{0} {1}' of class '{2}' has no 'set' accessor.",
-                    propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
-                throw new Exception(message);
-            }
+                return (_, __) => { };
 
             return (obj, value) => propertyInfo.SetValue(obj, value);
         }
-
-        // expression method is inefficient here
-
-        // private Action<object, object> GetPropertySetter(PropertyInfo propertyInfo, Type classType)
-        // {
-        //     var setMethodInfo = propertyInfo.SetMethod;
-        //     if (!propertyInfo.CanWrite)
-        //     {
-        //         var message = string.Format(
-        //             "The property '{0} {1}' of class '{2}' has no 'set' accessor.",
-        //             propertyInfo.PropertyType.FullName, propertyInfo.Name, propertyInfo.DeclaringType.FullName);
-        //         throw new Exception(message);
-        //     }
-
-        //     // lambdaExpression = (obj, value) => ((TClass) obj).SetMethod((TMember) value)
-        //     var objParameter = Expression.Parameter(typeof(object), "obj");
-        //     var valueParameter = Expression.Parameter(typeof(object), "value");
-        //     var lambdaExpression = Expression.Lambda<Action<object, object>>(
-        //         Expression.Call(
-        //             Expression.Convert(objParameter, classType),
-        //             setMethodInfo,
-        //             Expression.Convert(valueParameter, propertyInfo.PropertyType)
-        //         ),
-        //         objParameter,
-        //         valueParameter
-        //     );
-
-        //     return lambdaExpression.Compile();
-        // }
     }
 }
