@@ -88,14 +88,16 @@ namespace EnvironmentVariables
         }
 
         private static IEnumerable<string> SplitArray(string str) =>
-            str.Trim().Split(
+            str?.Trim()?.Split(
                 str.Contains(';') ? ';' : ',',
                 StringSplitOptions.RemoveEmptyEntries
             )
-            .Select(x => x.Trim());
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.Trim())
+            ?? Array.Empty<string>();
 
         private static object ConvertBase(string str, Type type) =>
-            string.IsNullOrWhiteSpace(str)
+            string.IsNullOrWhiteSpace(str) || str == "null" || str == "default"
                 ? Activator.CreateInstance(type)
                 : TypeDescriptor.GetConverter(type).ConvertFromString(str);
 
