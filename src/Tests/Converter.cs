@@ -1,6 +1,8 @@
 using System;
 using Xunit;
 using EnvironmentVariables;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Tests
 {
@@ -10,6 +12,10 @@ namespace Tests
         [InlineData(null)]
         [InlineData("")]
         [InlineData("null")]
+        public void StringsNull(string str) =>
+            Assert.Null(Utils.Convert(str, typeof(string)));
+
+        [Theory]
         [InlineData("test")]
         [InlineData("test;test,test")]
         public void Strings(string str) =>
@@ -108,7 +114,7 @@ namespace Tests
         [InlineData(typeof(int[]), "null", new int[] { 0 })]
         [InlineData(typeof(int[]), ",,  ,,,,,,  ,,", new int[0])]
         [InlineData(typeof(string[]), "  ;;;;  ;;;  ;;;", new string[0])]
-        [InlineData(typeof(string[]), "null, null", new string[] { "null", "null" })]
+        [InlineData(typeof(string[]), "null, null", new string[] { null, null })]
         [InlineData(typeof(int[]), "1", new int[] { 1 })]
         [InlineData(typeof(int[]), "1,2,3", new int[] { 1, 2, 3 })]
         [InlineData(typeof(int[]), ",1,2,3,", new int[] { 1, 2, 3 })]
@@ -116,6 +122,7 @@ namespace Tests
         [InlineData(typeof(int[]), "1;2;3", new int[] { 1, 2, 3 })]
         [InlineData(typeof(int[]), ";1;2;3;", new int[] { 1, 2, 3 })]
         [InlineData(typeof(int[]), "  ;  1;2; 3   ", new int[] { 1, 2, 3 })]
+        [InlineData(typeof(double[]), "1,2.2,3.3", new double[] { 1, 2.2, 3.3 })]
         [InlineData(typeof(string[]), "o,two,3", new string[] { "o", "two", "3" })]
         [InlineData(typeof(string[]), ",o,two,3,", new string[] { "o", "two", "3" })]
         [InlineData(typeof(string[]), "  ,  o,two, 3   ", new string[] { "o", "two", "3" })]
@@ -126,5 +133,56 @@ namespace Tests
         [Fact]
         public void NullableIntArray() =>
             Assert.Equal(new int?[] { 1, 2, 3, null }, Utils.Convert("  ,  1,2, 3, null   ", typeof(int?[])));
+
+        [Theory]
+        [InlineData("o,two,3")]
+        [InlineData(",o,two,3,")]
+        [InlineData("  ,  o,two, 3   ")]
+        public void ListsString(string str) =>
+            Assert.Equal(new List<string> { "o", "two", "3" }, Utils.Convert(str, typeof(List<string>)));
+
+        [Theory]
+        [InlineData("1,2.2222222,3.333")]
+        [InlineData(",1,2.2222222,3.333,")]
+        [InlineData("  ,  1,    2.2222222,3.333   ")]
+        public void IEnumerableDecimal(string str) =>
+            Assert.Equal(new List<decimal> { 1, 2.2222222m, 3.333m }, Utils.Convert(str, typeof(IEnumerable<decimal>)));
+
+        [Theory]
+        [InlineData("true,false,true")]
+        [InlineData(",  true,false ,true,     ")]
+        [InlineData("true;false;true;;;;")]
+        public void ICollectionBool(string str) =>
+            Assert.Equal(new List<bool> { true, false, true }, Utils.Convert(str, typeof(ICollection<bool>)));
+
+        [Theory]
+        [InlineData("1=one;2=two;3=")]
+        [InlineData("1=one,2=two,3=")]
+        [InlineData("1:one;2:two;3:")]
+        [InlineData("1:one,2:two,3:")]
+        [InlineData("1 = one; 2 = two; 3 = ;")]
+        [InlineData("  1=one  ,  2=two   ,   3=   ")]
+        [InlineData("1: one; 2: two; 3: ; ; ; ;  ;;")]
+        [InlineData("1   :one::,2    :two,3    ::")]
+        public void DictionaryString(string str) =>
+            Assert.Equal(
+                new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", null } },
+                Utils.Convert(str, typeof(Dictionary<string, string>))
+            );
+
+        [Theory]
+        [InlineData("1=true;2.2=false;3.33=null")]
+        [InlineData("1=true,2.2=false,3.33=null")]
+        [InlineData("1:true;2.2:false;3.33:null")]
+        [InlineData("1:true,2.2:false,3.33:null")]
+        [InlineData("1 = true; 2.2 = false; 3.33 =;")]
+        [InlineData("  1=true  ,  2.2=false   ,   3.33=null   ")]
+        [InlineData("1: true; 2.2: false; 3.33: ; ; ; ;  ;;")]
+        [InlineData("1   :true::,2.2    :false,3.33    :null:")]
+        public void DictionaryDoubleBool(string str) =>
+            Assert.Equal(
+                new Dictionary<double, bool?> { { 1, true }, { 2.2, false }, { 3.33, null } },
+                Utils.Convert(str, typeof(Dictionary<double, bool?>))
+            );
     }
 }
