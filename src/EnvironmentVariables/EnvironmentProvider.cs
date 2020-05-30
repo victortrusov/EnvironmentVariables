@@ -39,7 +39,7 @@ namespace EnvironmentVariables
         /// You can provide initial values with this constructor
         /// </summary>
         /// <param name="initialValues">Object that will be used as initial values</param>
-        public EnvironmentProvider(T initialValues)
+        public EnvironmentProvider(T? initialValues)
         {
             Values = initialValues ?? new T();
             var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
