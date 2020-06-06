@@ -11,7 +11,7 @@ namespace Example
         {
             Console.WriteLine("Hello World!");
 
-            var provider = new EnvironmentProvider<Config>();
+            var provider = new EnvironmentProvider<EnvConfig>();
 
             var values = provider.Values;
 

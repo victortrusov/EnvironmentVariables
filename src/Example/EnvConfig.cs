@@ -3,7 +3,7 @@ using EnvironmentVariables;
 
 namespace Example
 {
-    public class Config
+    public class EnvConfig
     {
         [Env("ASPNETCORE_ENVIRONMENT")]
         public string AspNetCoreEnvironment { get; set; }

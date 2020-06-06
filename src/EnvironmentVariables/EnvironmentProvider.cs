@@ -28,7 +28,7 @@ namespace EnvironmentVariables
         public Func<string, string> EnvProvider { get; set; } =
             (string s) => Environment.GetEnvironmentVariable(s);
 
-        //public Action<string> SelfLog { get; set; } = (string _) => { };
+        public Action<string> SelfLog { get; set; } = (string _) => { };
 
         /// <summary>
         /// Default constructor. Create object of provided type and set values to props.
@@ -55,16 +55,19 @@ namespace EnvironmentVariables
         public void Reload()
         {
             foreach (var member in members)
-            {
-                //get env value
-                var stringValue = EnvProvider(member.EnvName);
+                try
+                {
+                    var stringValue = EnvProvider(member.EnvName);
 
-                //skip if no value
-                if (string.IsNullOrEmpty(stringValue)) continue;
+                    if (string.IsNullOrEmpty(stringValue)) continue;
 
-                object propValue = Utils.Convert(stringValue, member.Type);
-                member.Setter(Values, propValue);
-            }
+                    object? propValue = Utils.Convert(stringValue, member.Type);
+                    member.Setter(Values, propValue);
+                }
+                catch (Exception ex)
+                {
+                    SelfLog($"{ex.Message} {ex.StackTrace}");
+                }
         }
 
     }

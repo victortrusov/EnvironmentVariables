@@ -104,7 +104,7 @@ namespace EnvironmentVariables
                 : TypeDescriptor.GetConverter(type).ConvertFromString(str);
         }
 
-        public static Action<object, object> GetPropertySetter(PropertyInfo propertyInfo)
+        public static Action<object, object?> GetPropertySetter(PropertyInfo propertyInfo)
         {
             if (!propertyInfo.CanWrite)
                 return (_, __) => { };

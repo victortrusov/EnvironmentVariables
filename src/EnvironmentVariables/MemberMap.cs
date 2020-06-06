@@ -17,7 +17,7 @@ namespace EnvironmentVariables
         public string EnvName;
         public string PropertyName;
         public Type Type;
-        public Action<object, object> Setter;
+        public Action<object, object?> Setter;
     }
 }
 
