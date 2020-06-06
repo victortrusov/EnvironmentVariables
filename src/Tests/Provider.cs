@@ -13,6 +13,12 @@ namespace Tests
         [Env("DECIMAL")]
         public decimal Decimal { get; set; } = 2.135m;
 
+        [Env("ENUM")]
+        public TestEnum Enum { get; set; }
+
+        [Env("NULLABLEENUM")]
+        public TestEnum? NullableEnum { get; set; }
+
         [Env("ARRAY")]
         public int[] Array { get; set; }
 
@@ -21,6 +27,9 @@ namespace Tests
 
         [Env("DICTIONARY")]
         public Dictionary<string, double> Dictionary { get; set; }
+
+        [Env("STRING")]
+        public string NoSetter { get; }
 
         public string NoName { get; set; }
     }
@@ -41,6 +50,21 @@ namespace Tests
             Environment.SetEnvironmentVariable("DECIMAL", "1.111");
             var provider = new EnvironmentProvider<EnvConfig>();
             Assert.Equal(1.111m, provider.Values.Decimal);
+        }
+
+        [Fact]
+        public void Enum()
+        {
+            Environment.SetEnvironmentVariable("ENUM", "Two");
+            var provider = new EnvironmentProvider<EnvConfig>();
+            Assert.Equal(TestEnum.Two, provider.Values.Enum);
+        }
+
+        [Fact]
+        public void NullableEnum()
+        {
+            var provider = new EnvironmentProvider<EnvConfig>();
+            Assert.Null(provider.Values.NullableEnum);
         }
 
         [Fact]
@@ -65,6 +89,13 @@ namespace Tests
             Environment.SetEnvironmentVariable("DICTIONARY", "test=1;test2=2.22");
             var provider = new EnvironmentProvider<EnvConfig>();
             Assert.Equal(new Dictionary<string, double>() { { "test", 1 }, { "test2", 2.22 } }, provider.Values.Dictionary);
+        }
+
+        [Fact]
+        public void NoSetter()
+        {
+            var provider = new EnvironmentProvider<EnvConfig>();
+            Assert.Null(provider.Values.NoSetter);
         }
 
         [Fact]

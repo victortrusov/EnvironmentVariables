@@ -109,6 +109,17 @@ namespace Tests
             Assert.Null(Utils.Convert(str, typeof(bool?)));
 
         [Theory]
+        [InlineData("Two")]
+        [InlineData("two")]
+        [InlineData("TWO")]
+        [InlineData("2")]
+        public void Enum(string str) => Assert.Equal(
+                TestEnum.Two,
+                Utils.Convert(str, typeof(TestEnum))
+            );
+
+
+        [Theory]
         [InlineData(typeof(int[]), null, new int[0])]
         [InlineData(typeof(int[]), "", new int[0])]
         [InlineData(typeof(int[]), "null", new int[] { 0 })]
@@ -127,6 +138,9 @@ namespace Tests
         [InlineData(typeof(string[]), ",o,two,3,", new string[] { "o", "two", "3" })]
         [InlineData(typeof(string[]), "  ,  o,two, 3   ", new string[] { "o", "two", "3" })]
         [InlineData(typeof(bool[]), "true,false,true", new bool[] { true, false, true })]
+        [InlineData(typeof(TestEnum[]), "Two,one,ZERO", new TestEnum[] { TestEnum.Two, TestEnum.One, TestEnum.Zero })]
+        [InlineData(typeof(TestEnum[]), " , Two,one  ,ZERO,,", new TestEnum[] { TestEnum.Two, TestEnum.One, TestEnum.Zero })]
+        [InlineData(typeof(TestEnum[]), " 2 ; 1 ;;;0", new TestEnum[] { TestEnum.Two, TestEnum.One, TestEnum.Zero })]
         public void Arrays(Type type, string str, object result) =>
             Assert.Equal(result, Utils.Convert(str, type));
 
@@ -156,18 +170,18 @@ namespace Tests
             Assert.Equal(new List<bool> { true, false, true }, Utils.Convert(str, typeof(ICollection<bool>)));
 
         [Theory]
-        [InlineData("1=one;2=two;3=")]
-        [InlineData("1=one,2=two,3=")]
-        [InlineData("1:one;2:two;3:")]
-        [InlineData("1:one,2:two,3:")]
-        [InlineData("1 = one; 2 = two; 3 = ;")]
-        [InlineData("  1=one  ,  2=two   ,   3=   ")]
-        [InlineData("1: one; 2: two; 3: ; ; ; ;  ;;")]
-        [InlineData("1   :one::,2    :two,3    ::")]
-        public void DictionaryString(string str) =>
+        [InlineData("1=one;2=two;0=")]
+        [InlineData("1=one,2=two,Zero=")]
+        [InlineData("one:one;two:two;zero:")]
+        [InlineData("1:one,2:two,0:")]
+        [InlineData("OnE = one; 2 = two; ZERO = ;")]
+        [InlineData("  1=one  ,  2=two   ,   0=   ")]
+        [InlineData("one: one; two: two; 0: ; ; ; ;  ;;")]
+        [InlineData("1   :one::,2    :two,zero    ::")]
+        public void DictionaryEnumString(string str) =>
             Assert.Equal(
-                new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", null } },
-                Utils.Convert(str, typeof(Dictionary<string, string>))
+                new Dictionary<TestEnum, string> { { TestEnum.One, "one" }, { TestEnum.Two, "two" }, { TestEnum.Zero, null } },
+                Utils.Convert(str, typeof(Dictionary<TestEnum, string>))
             );
 
         [Theory]
@@ -184,5 +198,12 @@ namespace Tests
                 new Dictionary<double, bool?> { { 1, true }, { 2.2, false }, { 3.33, null } },
                 Utils.Convert(str, typeof(Dictionary<double, bool?>))
             );
+    }
+
+    public enum TestEnum
+    {
+        Zero,
+        One,
+        Two
     }
 }
