@@ -34,75 +34,59 @@ namespace Tests
         public string NoName { get; set; }
     }
 
-    public class Provider
+    public class Provider : IDisposable
     {
-        [Fact]
-        public void String()
+        EnvironmentProvider<EnvConfig> provider;
+        public Provider()
         {
             Environment.SetEnvironmentVariable("STRING", "test");
-            var provider = new EnvironmentProvider<EnvConfig>();
-            Assert.Equal("test", provider.Values.String);
-        }
-
-        [Fact]
-        public void Decimal()
-        {
             Environment.SetEnvironmentVariable("DECIMAL", "1.111");
-            var provider = new EnvironmentProvider<EnvConfig>();
-            Assert.Equal(1.111m, provider.Values.Decimal);
-        }
-
-        [Fact]
-        public void Enum()
-        {
             Environment.SetEnvironmentVariable("ENUM", "Two");
-            var provider = new EnvironmentProvider<EnvConfig>();
-            Assert.Equal(TestEnum.Two, provider.Values.Enum);
-        }
-
-        [Fact]
-        public void NullableEnum()
-        {
-            var provider = new EnvironmentProvider<EnvConfig>();
-            Assert.Null(provider.Values.NullableEnum);
-        }
-
-        [Fact]
-        public void Array()
-        {
             Environment.SetEnvironmentVariable("ARRAY", "1,2,3");
-            var provider = new EnvironmentProvider<EnvConfig>();
-            Assert.Equal(new[] { 1, 2, 3 }, provider.Values.Array);
-        }
-
-        [Fact]
-        public void List()
-        {
             Environment.SetEnvironmentVariable("LIST", "true, FALSE, True");
-            var provider = new EnvironmentProvider<EnvConfig>();
-            Assert.Equal(new List<bool> { true, false, true }, provider.Values.List);
-        }
-
-        [Fact]
-        public void Dictionary()
-        {
             Environment.SetEnvironmentVariable("DICTIONARY", "test=1;test2=2.22");
-            var provider = new EnvironmentProvider<EnvConfig>();
+            provider = new EnvironmentProvider<EnvConfig>();
+        }
+
+        public void Dispose()
+        {
+            provider.Dispose();
+        }
+
+        [Fact]
+        public void String() =>
+            Assert.Equal("test", provider.Values.String);
+
+        [Fact]
+        public void Decimal() =>
+            Assert.Equal(1.111m, provider.Values.Decimal);
+
+        [Fact]
+        public void Enum() =>
+            Assert.Equal(TestEnum.Two, provider.Values.Enum);
+
+        [Fact]
+        public void NullableEnum() =>
+            Assert.Null(provider.Values.NullableEnum);
+
+        [Fact]
+        public void Array() =>
+            Assert.Equal(new[] { 1, 2, 3 }, provider.Values.Array);
+
+        [Fact]
+        public void List() =>
+            Assert.Equal(new List<bool> { true, false, true }, provider.Values.List);
+
+        [Fact]
+        public void Dictionary() =>
             Assert.Equal(new Dictionary<string, double>() { { "test", 1 }, { "test2", 2.22 } }, provider.Values.Dictionary);
-        }
 
         [Fact]
-        public void NoSetter()
-        {
-            var provider = new EnvironmentProvider<EnvConfig>();
+        public void NoSetter() =>
             Assert.Null(provider.Values.NoSetter);
-        }
 
         [Fact]
-        public void NoName()
-        {
-            var provider = new EnvironmentProvider<EnvConfig>();
+        public void NoName() =>
             Assert.Null(provider.Values.NoName);
-        }
     }
 }

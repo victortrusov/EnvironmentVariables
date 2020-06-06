@@ -11,7 +11,7 @@ namespace EnvironmentVariables
     /// Provider that allows you to access environment variables through object of specified class
     /// </summary>
     /// <typeparam name="T">Class that contains environment variables as props</typeparam>
-    public partial class EnvironmentProvider<T> where T : class, new()
+    public partial class EnvironmentProvider<T> : IDisposable where T : class, new()
     {
         private readonly Type type = typeof(T);
         private readonly List<MemberMap> members = new List<MemberMap>();
@@ -68,6 +68,12 @@ namespace EnvironmentVariables
                 {
                     SelfLog($"{ex.Message} {ex.StackTrace}");
                 }
+        }
+
+        public void Dispose()
+        {
+            if (Values is IDisposable)
+                ((IDisposable)Values).Dispose();
         }
 
     }
