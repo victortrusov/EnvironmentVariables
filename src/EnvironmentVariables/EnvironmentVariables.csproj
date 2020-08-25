@@ -1,6 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackageId>EnvironmentVariables</PackageId>
+    <Title>EnvironmentVariables</Title>
+    <PackageDescription>Small .NET Standard library to easy access to all environment variables you need</PackageDescription>
+    <Version>0.1.0</Version>
+    <Authors>Victor Trusov</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/victortrusov/EnvironmentVariables</RepositoryUrl>
+    <PackageTags>environment variables;provider;environment;</PackageTags>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
