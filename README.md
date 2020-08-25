@@ -1,4 +1,7 @@
 # EnvironmentVariables
+
+[![NuGet version](https://badge.fury.io/nu/EnvironmentVariables.svg)](https://badge.fury.io/nu/EnvironmentVariables)
+
 Small .NET Standard library to easy access to all environment variables you need.
 Targets .NET Standard 2.1 (.NET Core 3.x)
 
