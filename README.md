@@ -62,6 +62,18 @@ Console.WriteLine(provider.Values.MyEnvBool);
 //True
 ```
 
+## Dependency injection (.NET Core)
+You can easily add provider to your services 
+```csharp
+services.AddSingleton<EnvironmentProvider<EnvConfig>>();
+```
+or POCO class
+```csharp
+services.AddSingleton<EnvConfig>(
+    _ => new EnvironmentProvider<EnvConfig>().Values
+);
+```
+
 # Type support
 
 This library supports: 
