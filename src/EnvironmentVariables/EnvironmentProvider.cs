@@ -25,7 +25,7 @@ namespace EnvironmentVariables
         /// Function that uses to access value of environment variable. 
         /// <see cref="Environment.GetEnvironmentVariable(string)" /> by default.
         /// </summary>
-        public Func<string, string> EnvProvider { get; set; } = Environment.GetEnvironmentVariable;
+        public Func<string, string?> EnvProvider { get; set; } = Environment.GetEnvironmentVariable;
 
         public Action<string> SelfLog { get; set; } = (string _) => { };
 

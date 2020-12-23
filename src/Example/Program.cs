@@ -28,6 +28,7 @@ namespace Example
             Console.WriteLine(string.Join(", ", values.MyEnvIntEnumerable));
             Console.WriteLine(string.Join(", ", values.MyEnvIntDictionary));
             Console.WriteLine(string.Join(", ", values.MyEnvIntStrDictionary));
+            Console.WriteLine(values.MyNullList is null ? "I should be null and i'm null" : "Something goes wrong");
         }
     }
 }

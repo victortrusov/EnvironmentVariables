@@ -4,12 +4,12 @@
     <PackageId>EnvironmentVariables</PackageId>
     <Title>EnvironmentVariables</Title>
     <PackageDescription>Small .NET Standard library to easy access to all environment variables you need</PackageDescription>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Victor Trusov</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/victortrusov/EnvironmentVariables</RepositoryUrl>
     <PackageTags>environment variables;provider;environment;</PackageTags>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>net5.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

@@ -43,5 +43,8 @@ namespace Example
 
         [Env("MY_ENV_INT_DICT")]
         public Dictionary<int, string> MyEnvIntStrDictionary { get; set; }
+
+        [Env("MY_NULL_LIST")]
+        public List<string> MyNullList { get; set; }
     }
 }

@@ -26,12 +26,15 @@ namespace EnvironmentVariables
                 _ => ConvertBase(str, type)
             };
 
-        private static object ConvertCollection(string? str, Type type)
+        private static object? ConvertCollection(string? str, Type type)
         {
             // get element type
             var elementType = type.IsArray
                 ? type.GetElementType()
                 : type.GetGenericArguments().Single();
+
+            if (elementType is null)
+                throw new Exception("Can't get the collection element type");
 
             //converting every element
             var list = SplitArray(str).Select(x => ConvertBase(x, elementType));
@@ -43,12 +46,17 @@ namespace EnvironmentVariables
             return InvokeEnumerableMethod(type.IsArray ? "ToArray" : "ToList", elementType, castedList);
         }
 
-        private static object InvokeEnumerableMethod(string methodName, Type elementType, object list) =>
-            typeof(Enumerable).GetMethod(methodName)
-                .MakeGenericMethod(new[] { elementType })
-                .Invoke(null, new object[] { list });
+        private static object? InvokeEnumerableMethod(string methodName, Type elementType, object? list)
+        {
+            if (list is null)
+                return null;
 
-        private static object ConvertDictionary(string? str, Type type)
+            return typeof(Enumerable).GetMethod(methodName)
+                ?.MakeGenericMethod(new[] { elementType })
+                .Invoke(null, new object[] { list });
+        }
+
+        private static object? ConvertDictionary(string? str, Type type)
         {
             // get element types
             var elementTypes = type.GetGenericArguments();
@@ -74,7 +82,7 @@ namespace EnvironmentVariables
                 ).ToArray();
 
                 //add to dictionary
-                type.GetMethod("Add", elementTypes)
+                type.GetMethod("Add", elementTypes)?
                     .Invoke(dictionary, keyValueArray);
             }
 
