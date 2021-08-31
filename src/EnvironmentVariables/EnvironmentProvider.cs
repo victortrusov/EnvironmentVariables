@@ -1,20 +1,20 @@
-﻿using System.Linq;
+﻿using System;
 using System.Collections.Generic;
-using System;
-using System.ComponentModel;
 using System.Reflection;
-using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("EnvironmentVariables.Tests")]
 namespace EnvironmentVariables
 {
     /// <summary>
     /// Provider that allows you to access environment variables through object of specified class
     /// </summary>
     /// <typeparam name="T">Class that contains environment variables as props</typeparam>
-    public partial class EnvironmentProvider<T> : IDisposable where T : class, new()
+    public class EnvironmentProvider<T> : IDisposable where T : class, new()
     {
         private readonly Type type = typeof(T);
         private readonly List<MemberMap> members = new List<MemberMap>();
+        private readonly ConverterService converterService = new ConverterService();
 
         /// <summary>
         /// Values of all defined environment variables
@@ -41,12 +41,16 @@ namespace EnvironmentVariables
         public EnvironmentProvider(T? initialValues)
         {
             Values = initialValues ?? new T();
-            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var properties = GetProperties();
+
             foreach (var prop in properties)
                 members.Add(new MemberMap(prop));
 
             Reload();
         }
+
+        private PropertyInfo[] GetProperties() =>
+            type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
         /// <summary>
         /// Reload all values
@@ -60,7 +64,7 @@ namespace EnvironmentVariables
 
                     if (string.IsNullOrEmpty(stringValue)) continue;
 
-                    object? propValue = Utils.Convert(stringValue, member.Type);
+                    object? propValue = converterService.Convert(stringValue, member.Type);
                     member.Setter(Values, propValue);
                 }
                 catch (Exception ex)

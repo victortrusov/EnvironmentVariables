@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnvironmentVariables", "Env
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{100DE194-BF63-4DEB-8C9F-F90E4FEB9093}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{BB7864A5-20D0-494D-810D-C2297629840C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnvironmentVariables.Tests", "EnvironmentVariables.Tests\EnvironmentVariables.Tests.csproj", "{BB7864A5-20D0-494D-810D-C2297629840C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

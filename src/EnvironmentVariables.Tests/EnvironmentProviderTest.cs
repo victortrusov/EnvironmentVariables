@@ -34,10 +34,10 @@ namespace Tests
         public string NoName { get; set; }
     }
 
-    public class Provider : IDisposable
+    public class EnvironmentProviderTest : IDisposable
     {
         EnvironmentProvider<EnvConfig> provider;
-        public Provider()
+        public EnvironmentProviderTest()
         {
             Environment.SetEnvironmentVariable("STRING", "test");
             Environment.SetEnvironmentVariable("DECIMAL", "1.111");

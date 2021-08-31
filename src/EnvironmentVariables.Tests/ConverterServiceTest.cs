@@ -1,25 +1,27 @@
 using System;
-using Xunit;
-using EnvironmentVariables;
 using System.Collections;
 using System.Collections.Generic;
+using EnvironmentVariables;
+using Xunit;
 
 namespace Tests
 {
-    public class Converter
+    public class ConverterServiceTest
     {
+        private ConverterService converterService = new ConverterService();
+
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData("null")]
         public void StringsNull(string str) =>
-            Assert.Null(Utils.Convert(str, typeof(string)));
+            Assert.Null(converterService.Convert(str, typeof(string)));
 
         [Theory]
         [InlineData("test")]
         [InlineData("test;test,test")]
         public void Strings(string str) =>
-            Assert.Equal(str, Utils.Convert(str, typeof(string)));
+            Assert.Equal(str, converterService.Convert(str, typeof(string)));
 
         [Theory]
         [InlineData(null, '\x0000')]
@@ -28,14 +30,14 @@ namespace Tests
         [InlineData("t", 't')]
         [InlineData("\x0001", '\x0001')]
         public void Chars(string str, char ch) =>
-            Assert.Equal(ch, Utils.Convert(str, typeof(char)));
+            Assert.Equal(ch, converterService.Convert(str, typeof(char)));
 
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData("null")]
         public void NullableChars(string str) =>
-           Assert.Null(Utils.Convert(str, typeof(char?)));
+           Assert.Null(converterService.Convert(str, typeof(char?)));
 
         [Theory]
         [InlineData(typeof(byte), null, (byte)0)]
@@ -57,7 +59,7 @@ namespace Tests
         [InlineData(typeof(float), "1", 1.0f)]
         [InlineData(typeof(float), "1.1", 1.1f)]
         public void Numbers(Type type, string str, object result) =>
-            Assert.Equal(result, Utils.Convert(str, type));
+            Assert.Equal(result, converterService.Convert(str, type));
 
         [Theory]
         [InlineData(typeof(byte?), null)]
@@ -72,22 +74,22 @@ namespace Tests
         [InlineData(typeof(float?), null)]
         [InlineData(typeof(float?), "")]
         public void NullableNumbers(Type type, string str) =>
-            Assert.Null(Utils.Convert(str, type));
+            Assert.Null(converterService.Convert(str, type));
 
         [Fact]
-        public void Decimal1() => Assert.Equal(0m, Utils.Convert(null, typeof(decimal)));
+        public void Decimal1() => Assert.Equal(0m, converterService.Convert(null, typeof(decimal)));
         [Fact]
-        public void Decimal2() => Assert.Equal(0m, Utils.Convert("", typeof(decimal)));
+        public void Decimal2() => Assert.Equal(0m, converterService.Convert("", typeof(decimal)));
         [Fact]
-        public void Decimal3() => Assert.Equal(1m, Utils.Convert("1", typeof(decimal)));
+        public void Decimal3() => Assert.Equal(1m, converterService.Convert("1", typeof(decimal)));
         [Fact]
-        public void Decimal4() => Assert.Equal(1.1m, Utils.Convert("1.1", typeof(decimal)));
+        public void Decimal4() => Assert.Equal(1.1m, converterService.Convert("1.1", typeof(decimal)));
         [Fact]
-        public void Decimal5() => Assert.Null(Utils.Convert(null, typeof(decimal?)));
+        public void Decimal5() => Assert.Null(converterService.Convert(null, typeof(decimal?)));
         [Fact]
-        public void Decimal6() => Assert.Null(Utils.Convert("", typeof(decimal?)));
+        public void Decimal6() => Assert.Null(converterService.Convert("", typeof(decimal?)));
         [Fact]
-        public void Decimal7() => Assert.Null(Utils.Convert("null", typeof(decimal?)));
+        public void Decimal7() => Assert.Null(converterService.Convert("null", typeof(decimal?)));
 
         [Theory]
         [InlineData(null, false)]
@@ -99,14 +101,14 @@ namespace Tests
         [InlineData("True", true)]
         [InlineData("TRUE", true)]
         public void Booleans(string str, bool result) =>
-            Assert.Equal(result, Utils.Convert(str, typeof(bool)));
+            Assert.Equal(result, converterService.Convert(str, typeof(bool)));
 
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData("null")]
         public void NullableBooleans(string str) =>
-            Assert.Null(Utils.Convert(str, typeof(bool?)));
+            Assert.Null(converterService.Convert(str, typeof(bool?)));
 
         [Theory]
         [InlineData("Two")]
@@ -115,7 +117,7 @@ namespace Tests
         [InlineData("2")]
         public void Enum(string str) => Assert.Equal(
                 TestEnum.Two,
-                Utils.Convert(str, typeof(TestEnum))
+                converterService.Convert(str, typeof(TestEnum))
             );
 
 
@@ -142,32 +144,32 @@ namespace Tests
         [InlineData(typeof(TestEnum[]), " , Two,one  ,ZERO,,", new TestEnum[] { TestEnum.Two, TestEnum.One, TestEnum.Zero })]
         [InlineData(typeof(TestEnum[]), " 2 ; 1 ;;;0", new TestEnum[] { TestEnum.Two, TestEnum.One, TestEnum.Zero })]
         public void Arrays(Type type, string str, object result) =>
-            Assert.Equal(result, Utils.Convert(str, type));
+            Assert.Equal(result, converterService.Convert(str, type));
 
         [Fact]
         public void NullableIntArray() =>
-            Assert.Equal(new int?[] { 1, 2, 3, null }, Utils.Convert("  ,  1,2, 3, null   ", typeof(int?[])));
+            Assert.Equal(new int?[] { 1, 2, 3, null }, converterService.Convert("  ,  1,2, 3, null   ", typeof(int?[])));
 
         [Theory]
         [InlineData("o,two,3")]
         [InlineData(",o,two,3,")]
         [InlineData("  ,  o,two, 3   ")]
         public void ListsString(string str) =>
-            Assert.Equal(new List<string> { "o", "two", "3" }, Utils.Convert(str, typeof(List<string>)));
+            Assert.Equal(new List<string> { "o", "two", "3" }, converterService.Convert(str, typeof(List<string>)));
 
         [Theory]
         [InlineData("1,2.2222222,3.333")]
         [InlineData(",1,2.2222222,3.333,")]
         [InlineData("  ,  1,    2.2222222,3.333   ")]
         public void IEnumerableDecimal(string str) =>
-            Assert.Equal(new List<decimal> { 1, 2.2222222m, 3.333m }, Utils.Convert(str, typeof(IEnumerable<decimal>)));
+            Assert.Equal(new List<decimal> { 1, 2.2222222m, 3.333m }, converterService.Convert(str, typeof(IEnumerable<decimal>)));
 
         [Theory]
         [InlineData("true,false,true")]
         [InlineData(",  true,false ,true,     ")]
         [InlineData("true;false;true;;;;")]
         public void ICollectionBool(string str) =>
-            Assert.Equal(new List<bool> { true, false, true }, Utils.Convert(str, typeof(ICollection<bool>)));
+            Assert.Equal(new List<bool> { true, false, true }, converterService.Convert(str, typeof(ICollection<bool>)));
 
         [Theory]
         [InlineData("1=one;2=two;0=")]
@@ -181,7 +183,7 @@ namespace Tests
         public void DictionaryEnumString(string str) =>
             Assert.Equal(
                 new Dictionary<TestEnum, string> { { TestEnum.One, "one" }, { TestEnum.Two, "two" }, { TestEnum.Zero, null } },
-                Utils.Convert(str, typeof(Dictionary<TestEnum, string>))
+                converterService.Convert(str, typeof(Dictionary<TestEnum, string>))
             );
 
         [Theory]
@@ -196,7 +198,7 @@ namespace Tests
         public void DictionaryDoubleBool(string str) =>
             Assert.Equal(
                 new Dictionary<double, bool?> { { 1, true }, { 2.2, false }, { 3.33, null } },
-                Utils.Convert(str, typeof(Dictionary<double, bool?>))
+                converterService.Convert(str, typeof(Dictionary<double, bool?>))
             );
     }
 
